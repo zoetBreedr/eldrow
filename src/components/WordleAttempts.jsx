@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import wordList from "./words.json";
+import words from "./wordsArray.json";
 
 const WordleAttempts = () => {
-  const [answer, setAnswer] = useState(["", "", "", "", ""]); // Initial empty answer array
+  const [answer, setAnswer] = useState(["C", "R", "A", "T", "E"]); // Initial empty answer array
   const [grid, setGrid] = useState(Array(6).fill(Array(5).fill(0))); // Initial grid with grey tiles
-  const [attempts, setAttempts] = useState([]); // Array to store the attempted words and their corresponding incorrect word lists
   const [submitted, setSubmitted] = useState(false); // Indicates if the input grid and correct word have been submitted
 
   const handleAnswerChange = (event, index) => {
@@ -32,53 +31,19 @@ const WordleAttempts = () => {
   };
 
   useEffect(() => {
-    // Generate possible incorrect words based on the patterns
-    const generatePossibleWords = (pattern) => {
-      const possibleWords = wordList.filter((word) =>
-        isPatternPossible(pattern, word)
-      );
-      return possibleWords;
-    };
-
-    const isPatternPossible = (pattern, word) => {
-      const wordSet = new Set(word);
-      const patternSet = new Set(pattern);
-
-      for (let i = 0; i < word.length; i++) {
-        if (pattern[i] === 1 && !wordSet.has(word[i])) {
-          return false;
-        }
-        if (pattern[i] === 0 && patternSet.has(word[i])) {
-          return false;
-        }
-      }
-
-      return true;
-    };
-
     if (submitted) {
-      let newAttempts = grid.map((pattern) => {
-        const incorrectWords = generatePossibleWords(pattern);
-        return { pattern, incorrectWords };
+      const matchingWords = words.filter((word) => {
+        return answer.every(
+          (letter, index) => word[index].toUpperCase() === letter
+        );
       });
 
-      // Remove incorrect words sections that follow an array of [2, 2, 2, 2, 2]
-      const lastNonZeroIndex = grid.findIndex((row) =>
-        row.some((value) => value !== 0)
-      );
-      if (lastNonZeroIndex !== -1) {
-        newAttempts = newAttempts.slice(0, lastNonZeroIndex + 1);
-      }
-
-      setAttempts(newAttempts);
+      console.log("Matching words:", matchingWords);
     }
-  }, [grid, submitted]);
+  }, [submitted, answer]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Add your logic here to process the answer and the grid
-    console.log("Answer:", answer);
-    console.log("Grid:", grid);
     setSubmitted(true);
   };
 
@@ -121,22 +86,6 @@ const WordleAttempts = () => {
             ))
           )}
         </div>
-        {submitted && attempts.length > 0 && (
-          <div className="mt-4">
-            {attempts.map((attempt, index) => (
-              <div key={index} className="mt-4">
-                <h3 className="text-lg font-bold mb-2">{`Incorrect Words for Attempt ${
-                  index + 1
-                }`}</h3>
-                <ul>
-                  {attempt.incorrectWords.map((word, wordIndex) => (
-                    <li key={wordIndex}>{word}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        )}
         <button
           type="submit"
           className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md"
