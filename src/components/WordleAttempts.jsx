@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import words from "./wordsArray.json";
+import words from "./words.json";
 
 const WordleAttempts = () => {
   const [answer, setAnswer] = useState(["C", "R", "A", "T", "E"]); // Initial empty answer array
   const [grid, setGrid] = useState(Array(6).fill(Array(5).fill(0))); // Initial grid with grey tiles
   const [submitted, setSubmitted] = useState(false); // Indicates if the input grid and correct word have been submitted
+  const [matchingWords, setMatchingWords] = useState([]);
 
   const handleAnswerChange = (event, index) => {
     const newAnswer = [...answer];
@@ -30,15 +31,41 @@ const WordleAttempts = () => {
     });
   };
 
+  const attempt = [[0, 2, 2, 2, 2]];
+
+  // Return answer from pattern
+  // const firstLetter = attempt[0][0]; // 0, ?
+  // const secondLetter = attempt[0][1]; // 2, R
+  // const thirdLetter = attempt[0][2]; // 2, A
+  // const fourthLetter = attempt[0][3]; // 2, T
+  // const fifthLetter = attempt[0][4]; // 2, E
+
   useEffect(() => {
     if (submitted) {
       const matchingWords = words.filter((word) => {
-        return answer.every(
-          (letter, index) => word[index].toUpperCase() === letter
-        );
+        const wordLetters = attempt[0].map((value, index) => {
+          if (value === 2) {
+            console.log(`Assigning answer[${index}]: ${answer[index]}`);
+            return answer[index];
+          }
+          console.log(`Not assigning answer[${index}]`);
+          return null;
+        });
+
+        console.log(`Word letters: ${wordLetters.join("")}`);
+        console.log(`Word: ${word.toUpperCase()}`);
+
+        const lastFourLetters = wordLetters.slice(1).join("").toUpperCase();
+        const attemptLetters = word.slice(1).toUpperCase();
+
+        console.log(`lastFourLetters: ${lastFourLetters}`);
+        console.log(`attemptLetters: ${attemptLetters}`);
+
+        return lastFourLetters === attemptLetters;
       });
 
       console.log("Matching words:", matchingWords);
+      setMatchingWords(matchingWords);
     }
   }, [submitted, answer]);
 
@@ -92,6 +119,16 @@ const WordleAttempts = () => {
         >
           Submit
         </button>
+        {matchingWords.length > 0 && (
+          <div className="mt-4">
+            <h3>Matching Words:</h3>
+            <ul>
+              {matchingWords.map((word, index) => (
+                <li key={index}>{word}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </form>
     </div>
   );
