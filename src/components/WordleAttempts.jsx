@@ -32,35 +32,49 @@ const WordleAttempts = () => {
     });
   };
 
-  const attempt = [[2, 0, 0, 0, 2]];
-
-  useEffect(() => {
-    if (submitted) {
-      // Convert attempt numbers to attempt letters
-      const attemptLetters = attempt[0].map((value, index) => {
-        if (value === 2) {
-          return answer[index].toLowerCase();
-        }
-        return null;
-      });
-
-      // Filter words that match the attempt
-      const matchingWords = wordsArray.filter((item) => {
-        return attemptLetters.every((pattern, index) => {
-          return (
-            pattern === null || pattern === item[index] || item[index] === null
-          );
-        });
-      });
-
-      setMatchingWords(matchingWords);
-    }
-  }, [submitted, answer]);
-
   const handleSubmit = (event) => {
     event.preventDefault();
     setSubmitted(true);
   };
+
+  useEffect(() => {
+    if (submitted) {
+      // Get the attempt grid
+      const attempt = [];
+      for (let i = 0; i < grid.length; i++) {
+        const row = grid[i].map((tile) => tile);
+        attempt.push(row);
+        if (row.join("") === "22222") {
+          break;
+        }
+      }
+
+      // Convert attempt numbers to attempt letters for each row
+      const matchingWords = attempt.map((row) => {
+        const attemptLetters = row.map((value, index) => {
+          if (value === 2) {
+            return answer[index].toLowerCase();
+          }
+          return null;
+        });
+
+        // Filter words that match the attempt pattern for each row
+        return wordsArray.filter((item) => {
+          return attemptLetters.every((pattern, index) => {
+            return (
+              pattern === null ||
+              pattern === item[index] ||
+              item[index] === null
+            );
+          });
+        });
+      });
+
+      console.log(matchingWords);
+
+      setMatchingWords(matchingWords);
+    }
+  }, [submitted, answer, grid]);
 
   return (
     <div className="mt-8">
@@ -110,11 +124,16 @@ const WordleAttempts = () => {
         {matchingWords.length > 0 && (
           <div className="mt-4">
             <h3>Matching Words:</h3>
-            <ul>
-              {matchingWords.map((word, index) => (
-                <li key={index}>{word}</li>
-              ))}
-            </ul>
+            {matchingWords.map((matchingWordsForRow, rowIndex) => (
+              <div key={rowIndex}>
+                <h4>Attempt {rowIndex + 1}:</h4>
+                <ul>
+                  {matchingWordsForRow.map((word, index) => (
+                    <li key={index}>{word}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         )}
       </form>
