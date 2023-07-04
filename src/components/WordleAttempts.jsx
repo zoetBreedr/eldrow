@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import words from "./words.json";
+import wordsArray from "./wordsArray.json";
 
 const WordleAttempts = () => {
   const [answer, setAnswer] = useState(["C", "R", "A", "T", "E"]); // Initial empty answer array
@@ -31,41 +32,44 @@ const WordleAttempts = () => {
     });
   };
 
-  const attempt = [[0, 2, 2, 2, 2]];
-
-  // Return answer from pattern
-  // const firstLetter = attempt[0][0]; // 0, ?
-  // const secondLetter = attempt[0][1]; // 2, R
-  // const thirdLetter = attempt[0][2]; // 2, A
-  // const fourthLetter = attempt[0][3]; // 2, T
-  // const fifthLetter = attempt[0][4]; // 2, E
+  const attempt = [[2, 0, 0, 2, 2]];
+  const attemptLetters = [["c", "r", null, null, "e"]];
 
   useEffect(() => {
     if (submitted) {
-      const matchingWords = words.filter((word) => {
-        const wordLetters = attempt[0].map((value, index) => {
-          if (value === 2) {
-            console.log(`Assigning answer[${index}]: ${answer[index]}`);
-            return answer[index];
-          }
-          console.log(`Not assigning answer[${index}]`);
-          return null;
+      const filteredArray = wordsArray.filter((item) => {
+        return attemptLetters[0].every((pattern, index) => {
+          return (
+            pattern === null || pattern === item[index] || item[index] === null
+          );
         });
-
-        console.log(`Word letters: ${wordLetters.join("")}`);
-        console.log(`Word: ${word.toUpperCase()}`);
-
-        const lastFourLetters = wordLetters.slice(1).join("").toUpperCase();
-        const attemptLetters = word.slice(1).toUpperCase();
-
-        console.log(`lastFourLetters: ${lastFourLetters}`);
-        console.log(`attemptLetters: ${attemptLetters}`);
-
-        return lastFourLetters === attemptLetters;
       });
 
-      console.log("Matching words:", matchingWords);
-      setMatchingWords(matchingWords);
+      console.log(filteredArray);
+      // const matchingWords = words.filter((word) => {
+      //   const wordLetters = attempt[0].map((value, index) => {
+      //     if (value === 2) {
+      //       // console.log(`Assigning answer[${index}]: ${answer[index]}`);
+      //       return answer[index];
+      //     }
+      //     // console.log(`Not assigning answer[${index}]`);
+      //     return 0;
+      //   });
+
+      //   console.log(`Word letters: ${wordLetters.join("")}`);
+      //   console.log(`Word: ${word.toUpperCase()}`);
+
+      //   // const lastFourLetters = wordLetters.slice(1).join("").toUpperCase();
+      //   // const attemptLetters = word.slice(1).toUpperCase();
+
+      //   // console.log(`lastFourLetters: ${lastFourLetters}`);
+      //   // console.log(`attemptLetters: ${attemptLetters}`);
+
+      //   // return lastFourLetters === attemptLetters;
+      // });
+
+      // console.log("Matching words:", matchingWords);
+      // setMatchingWords(matchingWords);
     }
   }, [submitted, answer]);
 
