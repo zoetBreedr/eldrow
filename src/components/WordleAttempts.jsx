@@ -32,44 +32,28 @@ const WordleAttempts = () => {
     });
   };
 
-  const attempt = [[2, 0, 0, 2, 2]];
-  const attemptLetters = [["c", "r", null, null, "e"]];
+  const attempt = [[2, 0, 0, 0, 2]];
 
   useEffect(() => {
     if (submitted) {
-      const filteredArray = wordsArray.filter((item) => {
-        return attemptLetters[0].every((pattern, index) => {
+      // Convert attempt numbers to attempt letters
+      const attemptLetters = attempt[0].map((value, index) => {
+        if (value === 2) {
+          return answer[index].toLowerCase();
+        }
+        return null;
+      });
+
+      // Filter words that match the attempt
+      const matchingWords = wordsArray.filter((item) => {
+        return attemptLetters.every((pattern, index) => {
           return (
             pattern === null || pattern === item[index] || item[index] === null
           );
         });
       });
 
-      console.log(filteredArray);
-      // const matchingWords = words.filter((word) => {
-      //   const wordLetters = attempt[0].map((value, index) => {
-      //     if (value === 2) {
-      //       // console.log(`Assigning answer[${index}]: ${answer[index]}`);
-      //       return answer[index];
-      //     }
-      //     // console.log(`Not assigning answer[${index}]`);
-      //     return 0;
-      //   });
-
-      //   console.log(`Word letters: ${wordLetters.join("")}`);
-      //   console.log(`Word: ${word.toUpperCase()}`);
-
-      //   // const lastFourLetters = wordLetters.slice(1).join("").toUpperCase();
-      //   // const attemptLetters = word.slice(1).toUpperCase();
-
-      //   // console.log(`lastFourLetters: ${lastFourLetters}`);
-      //   // console.log(`attemptLetters: ${attemptLetters}`);
-
-      //   // return lastFourLetters === attemptLetters;
-      // });
-
-      // console.log("Matching words:", matchingWords);
-      // setMatchingWords(matchingWords);
+      setMatchingWords(matchingWords);
     }
   }, [submitted, answer]);
 
